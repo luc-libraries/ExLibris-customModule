@@ -40,3 +40,20 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# ============================================================
+# Loyola (luc-libraries fork) — paths managed by the outer
+# `nde/` repo's scripts.mjs activate(viewId). These files are
+# generated/symlinked at setup or serve time; the fork should
+# not track them.
+# ============================================================
+
+# View assets (symlinked to nde/views/<view>/assets at activate time).
+/src/assets
+
+# Per-view feature registrations (symlinked from one of the tracked
+# mappings.<view>.ts files at activate time).
+/src/app/custom1-module/customComponentMappings.ts
+
+# Build metadata (regenerated with INST_ID/VIEW_ID at activate time).
+/build-settings.env

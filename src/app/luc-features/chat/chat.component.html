@@ -1,0 +1,62 @@
+<!-- Click-catcher behind the panel. Inert when closed so the page below
+     stays clickable. -->
+<div
+  class="backdrop"
+  [class.is-visible]="isOpen"
+  (click)="close()"
+  aria-hidden="true"
+></div>
+
+<!-- Tab + drawer slide together as one assembly. When closed, the panel
+     is translated right by the drawer's width so only the tab is
+     visible at the right edge of the viewport. The tab's top aligns
+     with the drawer's top via the panel's `align-items: flex-start`. -->
+<div class="chat-panel" [class.is-open]="isOpen">
+
+  <!-- Tab: always-visible icon-only toggle. The label is provided to
+       screen readers via the `.sr-only` span (defined globally in
+       `views/.../assets/css/custom.css`). Inline SVG so the icon picks
+       up the surrounding `color` via `fill="currentColor"`. -->
+  <button
+    type="button"
+    class="tab"
+    [attr.title]="triggerLabel"
+    [attr.aria-expanded]="isOpen"
+    aria-controls="chat-drawer"
+    (click)="toggle()"
+  >
+    <svg class="tab-icon" viewBox="0 0 30 30" aria-hidden="true">
+      <path d="M15 28.125C23.2838 28.125 30 22.2488 30 15C30 7.75125 23.2838 1.875 15 1.875C6.71625 1.875 0 7.75125 0 15C0 18.3 1.39313 21.3188 3.69375 23.625C3.51188 25.53 2.91188 27.6187 2.24813 29.1863C2.1 29.535 2.38687 29.925 2.76 29.865C6.99 29.1713 9.50437 28.1063 10.5975 27.5513C12.0333 27.9356 13.5136 28.1285 15 28.125Z" fill="currentColor"/>
+    </svg>
+    <span class="tab-label">{{ triggerLabel }}</span>
+  </button>
+
+  <!-- Drawer: holds the chat iframe. The iframe is lazy — only mounted
+       after the user first opens the drawer.
+
+       `role="region"` (not `dialog`): this is a non-modal disclosure
+       controlled by the tab button (via aria-expanded + aria-controls),
+       not a focus-trapping modal. region + aria-label makes it a
+       labeled landmark when open.
+
+       `inert` when closed: the drawer is translated off-screen via
+       CSS, but the iframe inside would otherwise remain in the tab
+       order. `inert` removes it from focus and AT until the drawer
+       opens. -->
+  <aside
+    id="chat-drawer"
+    class="drawer"
+    role="region"
+    [attr.aria-label]="triggerLabel"
+    [attr.aria-hidden]="!isOpen"
+    [attr.inert]="isOpen ? null : ''"
+  >
+    <iframe
+      *ngIf="hasLoaded"
+      class="chat-frame"
+      [src]="chatUrl"
+      title="LibraryH3lp chat"
+    ></iframe>
+  </aside>
+
+</div>

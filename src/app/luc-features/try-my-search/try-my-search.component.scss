@@ -1,0 +1,61 @@
+:host {
+  display: block;
+  margin-top: 1rem;
+}
+
+.card {
+  background-color: var(--neutralBG);
+  border: 1px solid var(--sys-outline-variant);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.heading {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: rgb(94, 94, 94);
+}
+
+.external-systems {
+  // <ul> in the markup — reset list chrome so the flex layout reads
+  // cleanly. `role="list"` on the <ul> keeps the list semantic in
+  // Safari, which drops it when `list-style: none` is applied.
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  > li {
+    // Two per row: each takes half the row minus half the gap. Below
+    // the mobile breakpoint, items go full-width and stack.
+    flex: 0 1 calc(50% - 0.5rem);
+  }
+}
+
+.external-system {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
+}
+
+.external-icon {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .external-systems > li {
+    flex-basis: 100%;
+  }
+}

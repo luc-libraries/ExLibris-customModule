@@ -1,0 +1,22 @@
+<section id="try-my-search-in" class="card"
+         *ngIf="links.length"
+         aria-labelledby="try-my-search-heading">
+  <h3 id="try-my-search-heading" class="heading">Try My Search In…</h3>
+  <ul class="external-systems" role="list">
+    <li *ngFor="let link of links">
+      <a
+        [href]="link.href"
+        target="_blank"
+        rel="noopener"
+        class="external-system"
+      >
+        <img *ngIf="link.icon" [src]="link.icon" alt="" class="external-icon">
+        <span class="mat-body-large">{{ link.label }}</span>
+        <!-- target="_blank" is invisible to screen readers; this span
+             appends the hint to the link's accessible name without
+             changing its visible label. -->
+        <span class="sr-only"> (opens in new window)</span>
+      </a>
+    </li>
+  </ul>
+</section>

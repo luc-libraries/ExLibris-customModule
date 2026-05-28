@@ -1,0 +1,176 @@
+// =====================================================================
+// Layout
+// =====================================================================
+// All chat positioning lives as global CSS custom properties on :root
+// in `views/.../assets/css/custom.css` (the `--chat-*` series). That
+// file is the single source of truth — edit there to move or resize
+// the widget, and the NDE-side overrides (`.side-bottom-buttons`,
+// snack bars) stay in sync.
+//
+// Fallback values inside `var(..., fallback)` calls keep the component
+// rendering sensibly even if `custom.css` isn't loaded — useful if
+// this feature is ever extracted into a standalone CARLI add-on.
+
+:host {
+  display: contents;
+
+  // XS: drawer shrinks so the assembly + tab + viewport margin fits
+  // within 100vw. (Variables resolved from :root in custom.css.)
+  @media (max-width: 575px) {
+    --chat-drawer-width: calc(
+      100vw - var(--chat-xs-margin, 1rem) - var(--chat-tab-width, 3rem)
+    );
+  }
+}
+
+// =====================================================================
+// Chat panel: the slideable container holding the drawer + tab
+// =====================================================================
+// Width matches the drawer (the tab is absolutely positioned outside
+// the panel's left edge so it doesn't contribute to the panel's box).
+
+.chat-panel {
+  position: fixed;
+  bottom: var(--chat-panel-bottom, 1rem);
+  right: 0;
+  z-index: 1002;
+  width: var(--chat-drawer-width, 350px);
+
+  // `ease-out` (fast → slow) responds immediately on click; `ease`
+  // looks similar on paper but its slow head reads as a hesitation.
+  transform: translateX(100%);
+  transition: transform var(--chat-transition, 0.15s ease-out);
+
+  // Material Design 10dp elevation — applied only when open so the
+  // shadow's leftward spread doesn't bleed back into the visible
+  // viewport while the drawer is translated off-screen. The tab keeps
+  // its own small shadow (below) when closed.
+  &.is-open {
+    transform: translateX(0);
+    filter:
+      drop-shadow(0 5px 5px rgba(0, 0, 0, 0.2))
+      drop-shadow(0 8px 10px rgba(0, 0, 0, 0.14))
+      drop-shadow(0 3px 14px rgba(0, 0, 0, 0.12));
+  }
+}
+
+// =====================================================================
+// Tab: gold gradient handle, icon only, juts out to the left
+// =====================================================================
+// `position: absolute` removes the tab from the panel's flow so the
+// panel sizes itself purely to the drawer. The negative `left` puts
+// the tab in the space to the left of the panel; `bottom: 0` aligns
+// its bottom with the drawer's bottom. The "Ask A Librarian" label
+// is provided to screen readers via the global `.sr-only` span
+// (defined in custom.css) inside the button.
+
+.tab {
+  position: absolute;
+  bottom: 0;
+  left: calc(-1 * var(--chat-tab-width, 3rem));
+  width: var(--chat-tab-width, 3rem);
+  padding: 0.75rem 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  background: linear-gradient(90deg, var(--luc_gold), var(--luc_gold_bright));
+  border: 0.25rem solid var(--luc_gold);
+  border-right: none;  // tucks flush against the drawer
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+
+  // Material Design 2dp elevation — subtle depth on the tab when
+  // closed. Cleared on the open state so the panel's larger drop-
+  // shadow (above) is the only shadow visible.
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.14),
+    0 2px 1px -1px rgba(0, 0, 0, 0.12),
+    0 1px 3px 0 rgba(0, 0, 0, 0.2);
+
+  color: var(--luc_maroon);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--luc_gold_bright);
+    outline: none;
+  }
+
+  .chat-panel.is-open & {
+    box-shadow: none;
+  }
+}
+
+.tab-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+// `.tab-label` is visible at MD and up — rotated 90° so it reads
+// vertically alongside the icon within the narrow tab. On XS / SM the
+// label is sr-only (override below): present in the DOM for screen
+// readers but visually clipped to nothing.
+.tab-label {
+  writing-mode: vertical-rl;
+  color: var(--luc_maroon);
+  font-size: 1.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .tab-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+// =====================================================================
+// Drawer: fills the panel; holds the chat iframe
+// =====================================================================
+
+.drawer {
+  width: 100%;
+  height: var(--chat-drawer-height, 450px);
+  max-height: calc(100vh - var(--chat-panel-bottom, 1rem) - 2rem);
+
+  background: var(--sys-surface, #f5f5f5);
+  border: 0.25rem solid var(--luc_gold);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+// =====================================================================
+// Backdrop: transparent click-catcher when open
+// =====================================================================
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+
+  &.is-visible {
+    pointer-events: auto;
+  }
+}
